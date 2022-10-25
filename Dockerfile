@@ -1,4 +1,4 @@
-FROM node:16
+FROM nixery.dev/ffmpeg/nodejs
 
 # Create app directory
 WORKDIR /usr/src/app

@@ -19,7 +19,7 @@ function getNumberOfFrame() {
 }
 
 function registerImage() {
-    const ffmpeg = spawn('ffmpeg', ['-rtsp_transport tcp', '-i', state.uri, '-ss', '00:00:01', '-f', 'image2', '-vframes', '1',
+    const ffmpeg = spawn('ffmpeg', ['-rtsp_transport', 'tcp', '-i', state.uri, '-ss', '00:00:01', '-f', 'image2', '-vframes', '1',
         `${state.videoName}/image-${state.currentIndex}.jpg`, '-v', 'error'])
     ffmpeg.on('close', (code) => {
         console.log(`Image ${state.currentIndex} created with code : ${code}`);

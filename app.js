@@ -43,15 +43,15 @@ function closeApplication() {
 
 function deleteFrames() {
     return fs.readdir(`${state.videoName}`).then(files => {
-        return Promise.all(files.filter(file=>file.includes("image")).map(file => {
-                return fs.rm(`${state.videoName}/${file}`).then(value => console.log(`File ${file} deleted`))
+        return Promise.all(files.filter(file => file.includes("image")).map(file => {
+            return fs.rm(`${state.videoName}/${file}`).then(value => console.log(`File ${file} deleted`))
         }));
     });
 }
 
 function createVideo() {
     console.log("Create video")
-    const ffmpeg = spawn('ffmpeg', ['-i', `${state.videoName}/image-%d.jpg`, '-vcodec', 'mpeg4', `${state.videoName}/${state.videoName}.avi`])
+    const ffmpeg = spawn('ffmpeg', ['-rtsp_transport', 'tcp', '-i', `${state.videoName}/image-%d.jpg`, '-vcodec', 'mpeg4', `${state.videoName}/${state.videoName}.avi`])
     ffmpeg.on('close', (code) => {
         console.log(`Video créer ${state.currentIndex} created with code : ${code}`);
         if (state.deleteFrame) {

@@ -10,6 +10,8 @@ let state = {
     deleteFrame: true
 }
 
+let videoInCreation = false;
+
 const path = state.videoName + '/state.json';
 
 console.log(`Enregistrement d'un timelapse de ${state.recordTime} tout les ${state.intervalleImage}`)
@@ -18,22 +20,28 @@ function getNumberOfFrame() {
     return state.recordTime / state.intervalleImage;
 }
 
+function writeState() {
+    fs.writeFile(path, JSON.stringify(state))
+}
+
 function registerImage() {
-    const ffmpeg = spawn('ffmpeg', ['-rtsp_transport', 'tcp', '-i', state.uri, '-ss', '00:00:01', '-f', 'image2', '-vframes', '1',
-        `${state.videoName}/image-${state.currentIndex}.jpg`, '-v', 'error'])
-    ffmpeg.on('close', (code) => {
-        console.log(`Image ${state.currentIndex} created with code : ${code}`);
-        if (code === 0) {
-            state.currentIndex++
-            fs.writeFile(path, JSON.stringify(state))
-            if (state.currentIndex > getNumberOfFrame()) {
-                createVideo();
+    if (!videoInCreation) {
+        const ffmpeg = spawn('ffmpeg', ['-rtsp_transport', 'tcp', '-i', state.uri, '-ss', '00:00:01', '-f', 'image2', '-vframes', '1',
+            `${state.videoName}/image-${state.currentIndex}.jpg`, '-v', 'error'])
+        ffmpeg.on('close', (code) => {
+            console.log(`Image ${state.currentIndex} created with code : ${code}`);
+            if (code === 0) {
+                state.currentIndex++
+                writeState();
+                if (state.currentIndex > getNumberOfFrame()) {
+                    createVideo();
+                }
             }
-        }
-    })
-    ffmpeg.stderr.on('data', (data) => {
-        console.error(`stderr: ${data}`);
-    });
+        })
+        ffmpeg.stderr.on('data', (data) => {
+            console.error(`stderr: ${data}`);
+        });
+    }
 }
 
 
@@ -50,23 +58,26 @@ function deleteFrames() {
 }
 
 function createVideo() {
-    console.log("Create video")
-    const ffmpeg = spawn('ffmpeg', ['-i', `${state.videoName}/image-%d.jpg`, '-vcodec', 'mpeg4', `${state.videoName}/${state.videoName}.avi`])
-    ffmpeg.on('close', (code) => {
-        console.log(`Video créer ${state.currentIndex} created with code : ${code}`);
-        if (state.deleteFrame) {
-            deleteFrames().then(() => {
-                console.log("Supression des frames termine")
-                closeApplication();
-            })
-        } else {
-            closeApplication();
-        }
-    })
-    ffmpeg.stderr.on('data', (data) => {
-        console.error(` Video création stderr: ${data}`);
-    });
+    if (!videoInCreation) {
+        videoInCreation = true
 
+        console.log("Create video")
+        const ffmpeg = spawn('ffmpeg', ['-i', `${state.videoName}/image-%d.jpg`, '-vcodec', 'mpeg4', `${state.videoName}/${state.videoName}.avi`])
+        ffmpeg.on('close', (code) => {
+            console.log(`Video créer ${state.currentIndex} created with code : ${code}`);
+            if (state.deleteFrame) {
+                deleteFrames().then(() => {
+                    console.log("Supression des frames termine")
+                    closeApplication();
+                })
+            } else {
+                closeApplication();
+            }
+        })
+        ffmpeg.stderr.on('data', (data) => {
+            console.error(` Video création stderr: ${data}`);
+        });
+    }
 }
 
 

@@ -51,7 +51,7 @@ function deleteFrames() {
 
 function createVideo() {
     console.log("Create video")
-    const ffmpeg = spawn('ffmpeg', ['-rtsp_transport', 'tcp', '-i', `${state.videoName}/image-%d.jpg`, '-vcodec', 'mpeg4', `${state.videoName}/${state.videoName}.avi`])
+    const ffmpeg = spawn('ffmpeg', ['-i', `${state.videoName}/image-%d.jpg`, '-vcodec', 'mpeg4', `${state.videoName}/${state.videoName}.avi`])
     ffmpeg.on('close', (code) => {
         console.log(`Video créer ${state.currentIndex} created with code : ${code}`);
         if (state.deleteFrame) {

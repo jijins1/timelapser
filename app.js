@@ -62,7 +62,7 @@ function createVideo() {
         videoInCreation = true
 
         console.log("Create video")
-        const ffmpeg = spawn('ffmpeg', ['-i', `${state.videoName}/image-%d.jpg`, '-vcodec', 'mpeg4', `${state.videoName}/${state.videoName}.avi`])
+        const ffmpeg = spawn('ffmpeg', ['-r','24', '-pattern_type','glob','-i', `${state.videoName}/*.jpg`, '-s', 'hd1080', '-vcodec', 'libx264', `${state.videoName}/${state.videoName}.mp4`])
         ffmpeg.on('close', (code) => {
             console.log(`Video créer ${state.currentIndex} created with code : ${code}`);
             if (state.deleteFrame) {

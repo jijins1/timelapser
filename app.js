@@ -7,7 +7,7 @@ let state = {
     intervalleImage: process.env.INTERVAL || 10000,
     recordTime: process.env.RECORD_TIME || 3600000,
     videoName: process.env.VIDEO_NAME || 'defaultName',
-    deleteFrame: true
+    deleteFrame: Boolean(process.env.DELETE_FRAME) || true
 }
 
 let videoInCreation = false;
@@ -62,7 +62,7 @@ function createVideo() {
         videoInCreation = true
 
         console.log("Create video")
-        const ffmpeg = spawn('ffmpeg', ['-r','24', '-pattern_type','glob','-i', `${state.videoName}/*.jpg`, '-s', 'hd1080', '-vcodec', 'libx264', `${state.videoName}/${state.videoName}.mp4`])
+        const ffmpeg = spawn('ffmpeg', ['-r', '25', '-pattern_type', 'glob', '-i', `"${state.videoName}/image-*.jpg"`, '-s', 'hd1080', '-vcodec', 'libx264', `${state.videoName}/${state.videoName}.mp4`])
         ffmpeg.on('close', (code) => {
             console.log(`Video créer ${state.currentIndex} created with code : ${code}`);
             if (state.deleteFrame) {

@@ -7,7 +7,7 @@ let state = {
     intervalleImage: process.env.INTERVAL || 10000,
     recordTime: process.env.RECORD_TIME || 3600000,
     videoName: process.env.VIDEO_NAME || 'defaultName',
-    deleteFrame: Boolean(process.env.DELETE_FRAME) || true
+    deleteFrame: Boolean(process.env.DELETE_FRAME) || false
 }
 
 let videoInCreation = false;
